@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 typedef struct { 
-	char red;
-	char green;
-	char blue;	
+	unsigned char red;
+	unsigned char green;
+	unsigned char blue;	
 	
 } Pixel;
 
@@ -15,7 +15,7 @@ typedef struct {
 Pixel *buffer;
 
 int main( int argc, char *argv[] );
-static Image *readPPM(char *filename)
+static Image *readP6(char *filename)
 {
 	char buff[16];
 	Image *image;
@@ -88,11 +88,39 @@ static Image *readPPM(char *filename)
 	return image;
 }
 
-int main(int argc, char* argv[]) {
-	if( argc != 3 || argc != 6){
-		fprintf(stderr, "invalid arguments given\n");
+void writeP6(char *filename, Image *image){
+	FILE *fp;
+	fp = fopen(filename, "wb");
+	if (!fp){ 
+		fprintf(stderr, "Unable to open file '%s'\n", filename); 
+		exit(1);
 	}
+
+
+	//file type
+	fprintf(fp, "P6\n");
+
+	fprintf(fp, "# Created by DATBOI");
+
+	//size
+	fprintf(fp, "%d %d\n",image->x,image->y);
+
+	//depth
+	fprintf(fp, "%d\n", 255);
+
+
+	//write data for image
+	fwrite(image->data, 3 * image->x, image->y, fp);
+	
+	fclose(fp);
+}
+
+int main(int argc, char* argv[]) {
+	//if( *argv[2] != '3' || *argv[2] != '6'){
+	//	fprintf(stderr, "invalid arguments given\n");
+	//}
 	Image *image;
-	image = readPPM("cam.ppm");
+	image = readP6(argv[2]);
+	writeP6(argv[3], image);
 	return 0;
 }
