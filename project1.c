@@ -14,6 +14,7 @@ typedef struct {
 
 Pixel *buffer;
 
+int main( int argc, char *argv[] );
 static Image *readPPM(char *filename)
 {
 	char buff[16];
@@ -87,7 +88,10 @@ static Image *readPPM(char *filename)
 	return image;
 }
 
-int main(void) {
+int main(int argc, char* argv[]) {
+	if( argc != 3 || argc != 6){
+		fprintf(stderr, "invalid arguments given\n");
+	}
 	Image *image;
 	image = readPPM("cam.ppm");
 	return 0;
