@@ -12,12 +12,11 @@ typedef struct {
 	Pixel *data;
 } Image;
 
-Pixel *buffer;
 
 int main( int argc, char *argv[] );
-static Image *readP6(char *filename)
+static Image *readP6(const char *filename)
 {
-	char buff[16];
+	unsigned char buff[512];
 	Image *image;
 	FILE *fp;
 	int c, rgb_color;
@@ -35,7 +34,7 @@ static Image *readP6(char *filename)
 
 	//Make sure image is in PPM format
 	if (buff[0] != 'P' || buff[1] != '6'){ 
-		fprintf(stderr, "Image is not P3 or P6 format\n");
+		fprintf(stderr, "Image is not P6 format\n");
 		exit(1);
 	 }
 
@@ -49,13 +48,13 @@ static Image *readP6(char *filename)
 	//have to account for comments
 	c = getc(fp);
     	while (c == '#') {
-    	while (getc(fp) != '\n') ;
+  	while (getc(fp) != '\n') ;
       		c = getc(fp);
     	}
 	ungetc(c, fp);
 
 	//set x and y values for the size of the image
-	if (fscanf(fp, "%d %d", &image->x,&image->y) != 2){
+	if (fscanf(fp, "%d %d", &image->x, &image->y) != 2){
 	//if more than 2 values for size, throw error
 		fprintf(stderr, "wrong image size for '%s'\n", filename);
 		exit(1);
@@ -79,16 +78,17 @@ static Image *readP6(char *filename)
 
 	if (!image){ fprintf (stderr, "cannot allocate memory\n");}
 
-	if (fread(image->data, 3 * image->x, image->y, fp) != image->y){
-		fprintf(stderr, "can't load image: '%s'", filename);
-		exit(1);
-	}
+	fread(image->data, 3 * (image->x+10), image->y, fp);
+	//if (fread(image->data, 3 * image->x, image->y, fp) !=  image->y){
+	//	fprintf(stderr, "can't load image: '%s'\n", filename);
+	//	exit(1);
+	//}
 
 	fclose(fp);
 	return image;
 }
 
-void writeP6(char *filename, Image *image){
+void writeP6(const char *filename, Image *image){
 	FILE *fp;
 	fp = fopen(filename, "wb");
 	if (!fp){ 
@@ -96,11 +96,10 @@ void writeP6(char *filename, Image *image){
 		exit(1);
 	}
 
-
 	//file type
 	fprintf(fp, "P6\n");
 
-	fprintf(fp, "# Created by DATBOI");
+	fprintf(fp, "# Created by DATBOI\n");
 
 	//size
 	fprintf(fp, "%d %d\n",image->x,image->y);
@@ -108,17 +107,16 @@ void writeP6(char *filename, Image *image){
 	//depth
 	fprintf(fp, "%d\n", 255);
 
-
 	//write data for image
-	fwrite(image->data, 3 * image->x, image->y, fp);
+	fwrite(image->data, 3 * (image->x+10), image->y, fp);
 	
 	fclose(fp);
 }
 
-int main(int argc, char* argv[]) {
-	//if( *argv[2] != '3' || *argv[2] != '6'){
-	//	fprintf(stderr, "invalid arguments given\n");
-	//}
+int main(int argc, char *argv[]) {
+
+	//fprintf("%d\n",atoi(argv[1]));
+	
 	Image *image;
 	image = readP6(argv[2]);
 	writeP6(argv[3], image);
