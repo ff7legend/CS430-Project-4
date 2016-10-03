@@ -13,3 +13,4 @@ EX: ppmrw.exe [3|6] [camP3.ppm | camP6.ppm] output.ppm.
 The Makefile
 
 To run the make file on Linux I simply ran a make command and it outputted the pppmrw executable.
+# CS430-Project-2
