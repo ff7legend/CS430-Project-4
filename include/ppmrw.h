@@ -1,4 +1,3 @@
-/* ppmrw header file */
 #ifndef PPMRW_H
 #define PPMRW_H
 
@@ -29,10 +28,10 @@ typedef struct RGBPixel_t {
 
 // image info
 typedef struct image_t {
-    RGBPixel *pixmap;
+    RGBPixel *map;
     int width, height, max_color_val;
 } image;
 
-void print_pixels(RGBPixel *pixmap, int width, int height);
+void print_pixels(RGBPixel *map, int width, int height);
 void create_ppm(FILE *fh, int type, image *img);
 #endif
