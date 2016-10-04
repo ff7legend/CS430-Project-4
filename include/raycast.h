@@ -19,15 +19,13 @@
 #include "ppmrw.h"
 #endif
 
-/* custom types */
 typedef struct ray_t {
     double origin[3];
     double direction[3];
 } ray;
 
 
-/* functions */
-void raycast_scene(image*, double, double, object*); 
+void raycast(image*, double, double, object*); 
 
 int get_camera(object*);
 #endif

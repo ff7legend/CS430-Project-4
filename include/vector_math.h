@@ -9,7 +9,7 @@
 #include <math.h>
 
 
-typedef double V3[3];   // represents a 3d vector
+typedef double V3[3];  
 
 
 static inline double sqr(double v) {

@@ -9,12 +9,11 @@
 #include <string.h>
 #include <ctype.h>
 
-#define MAX_OBJECTS 128     // maximume number of objects supported in json file
+#define MAX_OBJECTS 128    
 #define CAMERA 1
 #define SPHERE 2
 #define PLANE 3
 
-// structs to store different types of objects
 typedef struct camera_t {
     double width;
     double height;
@@ -32,9 +31,8 @@ typedef struct plane_t {
     double *normal;
 } plane;
 
-// object datatype to store json data
 typedef struct object_t {
-    int type;  // -1 so we can check if the object has been populated
+    int type; 
     union {
         camera cam;
         sphere sph;
@@ -42,11 +40,9 @@ typedef struct object_t {
     };
 } object;
 
-/* global variables */
 extern int line;
 extern object objects[MAX_OBJECTS];
 
-/* function definitions */
 void read_json(FILE *json);
 void print_objects(object *obj);
 

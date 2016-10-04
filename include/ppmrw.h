@@ -9,10 +9,8 @@
 #define TRUE 1
 #define MAX_SIZE 1024
 
-/* variables and types */
 typedef int8_t boolean;
 
-// file header info
 typedef struct header_t {
     int file_type;
     char **comments;
@@ -21,17 +19,15 @@ typedef struct header_t {
     int max_color_val;
 } header;
 
-// one pixel
 typedef struct RGBPixel_t {
     unsigned char r, g, b;
 } RGBPixel;
 
-// image info
 typedef struct image_t {
     RGBPixel *map;
     int width, height, max_color_val;
 } image;
 
 void print_pixels(RGBPixel *map, int width, int height);
-void create_ppm(FILE *fh, int type, image *img);
+void ppm_create(FILE *fh, int type, image *img);
 #endif
