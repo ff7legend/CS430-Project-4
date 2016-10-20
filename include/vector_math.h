@@ -1,8 +1,5 @@
 #ifndef VECTOR_MATH_H
 #define VECTOR_MATH_H
-#endif
-
-#ifdef VECTOR_MATH_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +7,6 @@
 
 
 typedef double V3[3];   // represents a 3d vector
-
 
 static inline double sqr(double v) {
     return v*v;
@@ -75,7 +71,5 @@ static inline void v3_reflect(V3 v, V3 n, V3 v_r) {
     v3_scale(n, scalar, tmp_vector);
     v3_sub(v, tmp_vector, v_r);
 }
-
-
 
 #endif

@@ -1,7 +1,7 @@
 #include <math.h>
-#include "../include/illumination.h"
-#include "../include/vector_math.h"
-#include "../include/json.h"
+#include "include/illumination.h"
+#include "include/vector_math.h"
+#include "include/json.h"
 
 
 double clamp(double color_val){

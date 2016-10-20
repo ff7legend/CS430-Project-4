@@ -1,3 +1,5 @@
+#ifndef CS430_PROJ3_ILLUMINATION_ILLUMINATION_H
+#define CS430_PROJ3_ILLUMINATION_ILLUMINATION_H
 #include "json.h"
 
 /* function declarations */

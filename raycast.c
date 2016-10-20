@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "../include/raycaster.h"
-#include "../include/vector_math.h"
-#include "../include/json.h"
-#include "../include/illumination.h"
+#include "include/raycast.h"
+#include "include/vector_math.h"
+#include "include/json.h"
+#include "include/illumination.h"
 #define SHININESS 20
 
-V3 background = {0, 0, 0};
+V3 background = {250, 0, 0};
 
 int get_camera(object *objects) {
     int i = 0;
@@ -38,7 +38,7 @@ void shade_pixel(double *color, int row, int col, image *img) {
 double plane_intersect(Ray *ray, double *Pos, double *Norm) {
     normalize(Norm);
     // check if the plane is parallel
-    double vd = v3_dot(Norm, Rd);
+    double vd = v3_dot(Norm, ray->direction);
     
     if (fabs(vd) < 0.0001) return -1;
 
@@ -54,10 +54,10 @@ double plane_intersect(Ray *ray, double *Pos, double *Norm) {
 }
 
 
-double sphere_intersect(double *Ro, double *Rd, double *C, double r) {
+double sphere_intersect(Ray *ray, double *C, double r)  {
     double b, c;
     double vector_diff[3];
-    v3_sub(ray->origin, C, vector_diff);
+    //v3_sub(ray->origin, C, vector_diff);
 
     //quadratic formula
     b = 2 * (ray->direction[0]*vector_diff[0] + ray->direction[1]*vector_diff[1] + ray->direction[2]*vector_diff[2]);
@@ -83,9 +83,10 @@ double sphere_intersect(double *Ro, double *Rd, double *C, double r) {
 void dist_index(Ray *ray, int self_index, double max_distance, int *ret_index, double *ret_best_t) {
     double best_t = INFINITY;
 	int best_o = -1;
-    for (int i=0; objects[i].type != 0; i++) {
-        // if self_index was passed in as > 0, we must ignore object i because we are checking distance to another
-        // object from the one at self_index.
+	int i;
+	
+    for (i=0; objects[i].type != 0; i++) {
+        
         if (self_index == i) continue;
 
         double t = 0;
@@ -121,7 +122,7 @@ void shade(Ray *ray, int obj_index, double t, double color[3]) {
     // loop through lights and do shadow test
     double new_origin[3];
     double new_dir[3];
-
+		int i;
     // find new ray origin
     if (ray->direction == NULL || ray->origin == NULL) {
         fprintf(stderr, "Error: shade: Ray had no data\n");
@@ -135,7 +136,7 @@ void shade(Ray *ray, int obj_index, double t, double color[3]) {
             .direction = {new_dir[0], new_dir[1], new_dir[2]}
     };
 
-    for (int i=0; i<nlights; i++) {
+    for (i=0; i<nlights; i++) {
         v3_sub(lights[i].position, ray_new.origin, ray_new.direction);
         double distance_to_light = v3_len(ray_new.direction);
         normalize(ray_new.direction);
@@ -144,7 +145,7 @@ void shade(Ray *ray, int obj_index, double t, double color[3]) {
         double best_t;  // distance
 
         //  check for intersections with other objects
-        get_dist_and_idx_closest_obj(&ray_new, obj_index, distance_to_light, &best_o, &best_t);
+        dist_index(&ray_new, obj_index, distance_to_light, &best_o, &best_t);
 
         double normal[3]; double obj_diff_color[3];double obj_spec_color[3];
         if (best_o == -1) { 
@@ -196,11 +197,13 @@ void shade(Ray *ray, int obj_index, double t, double color[3]) {
 
 void raycast(image *img, double cam_width, double cam_height, object *objects) {
   
-   /* int i;  // x 
+    int i;  // x 
     int j;  // y 
-    int o;  // object 
+    /*int o;  // object 
     */
-    double vp_pos[3] = {0, 0, 1};   double Ro[3] = {0, 0, 0};  double point[3] = {0, 0, 0};    
+    double vp_pos[3] = {0, 0, 1}; 
+	  //double Ro[3] = {0, 0, 0}; 
+	   double point[3] = {0, 0, 0};    
 
     double pixheight = (double)cam_height / (double)img->height;
     double pixwidth = (double)cam_width / (double)img->width;
@@ -214,8 +217,8 @@ void raycast(image *img, double cam_width, double cam_height, object *objects) {
             .direction = {0, 0, 0}
     };
 
-    for (int i = 0; i < img->height; i++) {
-        for (int j = 0; j < img->width; j++) {
+    for (i = 0; i < img->height; i++) {
+        for (j = 0; j < img->width; j++) {
             v3_zero(ray.origin);
             v3_zero(ray.direction);
             point[0] = vp_pos[0] - cam_width/2.0 + pixwidth*(j + 0.5);
@@ -236,7 +239,7 @@ void raycast(image *img, double cam_width, double cam_height, object *objects) {
                 set_color(color, i, j, img);
             }
             else {
-                set_color(background_color, i, j, img);
+                set_color(background, i, j, img);
             }
         }
     }

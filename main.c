@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
     }
 
   
-    raycast(&img, objects[pos].cam.width, objects[pos].cam.height, objects);
+    raycast(&img, objects[pos].camera.width, objects[pos].camera.height, objects);
 
     // create output
     FILE *out = fopen(argv[4], "wb");
