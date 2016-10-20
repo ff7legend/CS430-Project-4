@@ -19,6 +19,8 @@
 #include "ppmrw.h"
 #endif
 
+#define MAX_COLOR_VAL 255 
+
 typedef struct ray_t {
     double origin[3];
     double direction[3];
