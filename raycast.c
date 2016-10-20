@@ -146,9 +146,7 @@ void shade(Ray *ray, int obj_index, double t, double color[3]) {
         //  check for intersections with other objects
         get_dist_and_idx_closest_obj(&ray_new, obj_index, distance_to_light, &best_o, &best_t);
 
-        double normal[3];
-        double obj_diff_color[3];
-        double obj_spec_color[3];
+        double normal[3]; double obj_diff_color[3];double obj_spec_color[3];
         if (best_o == -1) { 
             v3_zero(normal); 
             v3_zero(obj_diff_color);
@@ -167,25 +165,21 @@ void shade(Ray *ray, int obj_index, double t, double color[3]) {
                 exit(1);
             }
             normalize(normal);
-            // find light, reflection and camera vectors
-            double L[3];
-            double R[3];
-            double V[3];
+           
+            double L[3];double R[3]; double V[3];
             v3_copy(ray_new.direction, L);
             normalize(L);
             v3_reflect(L, normal, R);
             v3_copy(ray->direction, V);
-            double diffuse[3];
-            double specular[3];
+            double diffuse[3];double specular[3];
             v3_zero(diffuse);
             v3_zero(specular);
             calculate_diffuse(normal, L, lights[i].color, obj_diff_color, diffuse);
             calculate_specular(SHININESS, L, R, normal, V, obj_spec_color, lights[i].color, specular);
 
-            // calculate the angular and radial attenuation
-            double fang;
-            double frad;
-            // get the vector from the object to the light
+           
+            double fang; double frad;
+            // vector from the object to the light
             double light_to_obj_dir[3];
             v3_copy(L, light_to_obj_dir);
             v3_scale(light_to_obj_dir, -1, light_to_obj_dir);
@@ -196,18 +190,17 @@ void shade(Ray *ray, int obj_index, double t, double color[3]) {
             color[1] += frad * fang * (specular[1] + diffuse[1]);
             color[2] += frad * fang * (specular[2] + diffuse[2]);
         }
-        // there was an object in the way, so we don't do anything. It's shadow
+        // object in the way *<--
     }
 }
 
 void raycast(image *img, double cam_width, double cam_height, object *objects) {
   
-    int i;  // x 
+   /* int i;  // x 
     int j;  // y 
     int o;  // object 
-    double vp_pos[3] = {0, 0, 1};   
-    double Ro[3] = {0, 0, 0};       
-    double point[3] = {0, 0, 0};    
+    */
+    double vp_pos[3] = {0, 0, 1};   double Ro[3] = {0, 0, 0};  double point[3] = {0, 0, 0};    
 
     double pixheight = (double)cam_height / (double)img->height;
     double pixwidth = (double)cam_width / (double)img->width;
@@ -215,53 +208,35 @@ void raycast(image *img, double cam_width, double cam_height, object *objects) {
     printf("pixh = %lf\n", pixwidth);
     printf("camw = %lf\n", cam_height);
     printf("camh = %lf\n", cam_width);
-    double Rd[3] = {0, 0, 0};       
-    point[2] = vp_pos[2];    
+    
+	Ray ray = {
+            .origin = {0, 0, 0},
+            .direction = {0, 0, 0}
+    };
 
-    for (i = 0; i < img->height; i++) {
-        point[1] = -(vp_pos[1] - cam_height/2.0 + pixheight*(i + 0.5));
-        for (j = 0; j < img->width; j++) {
+    for (int i = 0; i < img->height; i++) {
+        for (int j = 0; j < img->width; j++) {
+            v3_zero(ray.origin);
+            v3_zero(ray.direction);
             point[0] = vp_pos[0] - cam_width/2.0 + pixwidth*(j + 0.5);
-            normalize(point); 
-            Rd[0] = point[0]; // store point as ray direction
-            Rd[1] = point[1];
-            Rd[2] = point[2];
+            point[1] = -(vp_pos[1] - cam_height/2.0 + pixheight*(i + 0.5));
+            point[2] = vp_pos[2];    
+            normalize(point);  
+            v3_copy(point, ray.direction);
+            double color[3] = {0.0, 0.0, 0.0};
 
-            int best_o = 0;
-            double best_t = INFINITY;
-            for (o=0; objects[o].type != 0; o++) {
-                double t = 0;
-                switch(objects[o].type) {
-                    case 0:
-                        printf("no object found\n");
-                        break;
-                    case CAMERA:
-                        break;
-                    case SPHERE:
-                        t = sphere_intersect(Ro, Rd, objects[o].sph.position,
-                                                        objects[o].sph.radius);
-                        break;
-                    case PLANE:
-                        t = plane_intersect(Ro, Rd, objects[o].pln.position,
-                                                    objects[o].pln.normal);
-                        break;
-                    default:
-                        exit(1);
-                }
-                if (t > 0 && t < best_t) {
-                    best_t = t;
-                    best_o = o;
-                }
-            }
-            if (best_t > 0 && best_t != INFINITY) {
-                if (objects[best_o].type == PLANE) {
-                    shade_pixel(objects[best_o].pln.color, i, j, img);
-                }
-                else if (objects[best_o].type == SPHERE) {
-                    shade_pixel(objects[best_o].sph.color, i, j, img);
-                }
+            int best_o;     // index of the closest obj
+            double best_t;  // closest distance
+            dist_index(&ray, -1, INFINITY, &best_o, &best_t);
+
+      
+            if (best_t > 0 && best_t != INFINITY && best_o != -1) {
+			// intersection
+                shade(&ray, best_o, best_t, color);
+                set_color(color, i, j, img);
             }
             else {
+                set_color(background_color, i, j, img);
             }
         }
     }
