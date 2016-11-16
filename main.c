@@ -8,18 +8,14 @@
 #include "include/ppmrw.h"
 
 int main(int argc, char *argv[]) {
-
-	//Error checking
     if (argc != 5) {
         fprintf(stderr, "Error: main: You must have 4 arguments\n");
         exit(1);
     }
-
     if (atoi(argv[1]) <= 0 || atoi(argv[2]) <= 0) {
         fprintf(stderr, "Error: main: width and height parameters must be > 0\n");
         exit(1);
     }
-
 
     FILE *json = fopen(argv[3], "rb");
     if (json == NULL) {
@@ -27,9 +23,11 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    read_json(json); 
+    init_lights();
+    init_objects();
 
-    //create image 
+    read_json(json);
+
     image img;
     img.width = atoi(argv[1]);
     img.height = atoi(argv[2]);
@@ -40,19 +38,18 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-  
-    raycast(&img, objects[pos].camera.width, objects[pos].camera.height, objects);
+    /* fill the img->pixmap with colors by raycasting the objects */
+    raycast_scene(&img, objects[pos].camera.width, objects[pos].camera.height, objects);
 
-    // create output
+    // create output file and write image data 
     FILE *out = fopen(argv[4], "wb");
     if (out == NULL) {
         fprintf(stderr, "Error: main: Failed to create output file '%s'\n", argv[4]);
         exit(1);
     }
-
     ppm_create(out, 6, &img);
 
     fclose(out);
-    
+
     return 0;
 }

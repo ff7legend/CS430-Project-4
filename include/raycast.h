@@ -1,33 +1,24 @@
-#ifndef RAYCAST_H
-#define RAYCAST_H
-#endif
-
-#ifdef RAYCAST_H
+#ifndef RAYTRACER_H
+#define RAYTRACER_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-
-#ifndef JSON_H
-#include "json.h"
-#endif
-#ifndef VECTOR_MATH_H
-#include "vector_math.h"
-#endif
-#ifndef PPMRW_H
 #include "ppmrw.h"
-#endif
+#include "json.h"
+#include "vector_math.h"
 
-#define MAX_COLOR_VAL 255 
+#define MAX_COLOR_VAL 255   // maximum color to support for RGB
 
+/* custom types */
 typedef struct ray_t {
     double origin[3];
     double direction[3];
 } Ray;
 
-
-void raycast(image*, double, double, object*); 
-
+/* functions */
+void raycast_scene(image*, double, double, object*);
+void reflection_vector(V3 direction, V3 position, int obj_index, V3 reflection);
 int get_camera(object*);
 #endif

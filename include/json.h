@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "base.h"
 
 #define MAX_OBJECTS 128     // maximum number of objects supported in json file
 #define CAMERA 1

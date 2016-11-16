@@ -3,7 +3,7 @@
 #include <string.h>
 #include <strings.h>
 #include <ctype.h>
-#include "../include/json.h"
+#include "include/json.h"
 
 
 int line = 1;                   // line numbers
@@ -87,7 +87,7 @@ double* next_vector(FILE* json) {
     return v;
 }
 
-double* next_color(FILE* json, boolean is_rgb) {
+double* next_color(FILE* json, int is_rgb) {
     double* v = malloc(sizeof(double)*3);
     skip_ws(json);
     expect_c(json, '[');
@@ -103,7 +103,7 @@ double* next_color(FILE* json, boolean is_rgb) {
     v[2] = next_number(json);
     skip_ws(json);
     expect_c(json, ']');
-    if (is_rgb) {
+    if (is_rgb==1) {
         if (!check_color_val(v[0]) ||
             !check_color_val(v[1]) ||
             !check_color_val(v[2])) {
@@ -167,8 +167,8 @@ void read_json(FILE *json) {
     int obj_counter = 0;
     int light_counter = 0;
     int obj_type;
-    boolean not_done = true;
-    while (not_done) {
+    int not_done = 1;
+    while (not_done == 1) {
         //c  = next_c(json);
         if (obj_counter > MAX_OBJECTS) {
             fprintf(stderr, "Error: read_json: Number of objects is too large: %d\n", line);
@@ -213,7 +213,7 @@ void read_json(FILE *json) {
 
             skip_ws(json);
 
-            while (true) {
+            while (1) {
                 //  , }
                 c = next_c(json);
                 if (c == '}') {
@@ -333,7 +333,7 @@ void read_json(FILE *json) {
                             fprintf(stderr, "Error: Just plain 'color' vector can only be applied to a light object\n");
                             exit(1);
                         }
-                        lights[light_counter].color = next_color(json, false);
+                        lights[light_counter].color = next_color(json, 0);
                     }
                     else if (strcmp(key, "direction") == 0) {
                         if (obj_type != LIGHT) {
@@ -345,9 +345,9 @@ void read_json(FILE *json) {
                     }
                     else if (strcmp(key, "specular_color") == 0) {
                         if (obj_type == SPHERE)
-                            objects[obj_counter].sphere.spec_color = next_color(json, true);
+                            objects[obj_counter].sphere.spec_color = next_color(json, 1);
                         else if (obj_type == PLANE)
-                            objects[obj_counter].plane.spec_color = next_color(json, true);
+                            objects[obj_counter].plane.spec_color = next_color(json, 1);
                         else {
                             fprintf(stderr, "Error: read_json: speculaor_color vector can't be applied here: %d\n", line);
                             exit(1);
@@ -355,9 +355,9 @@ void read_json(FILE *json) {
                     }
                     else if (strcmp(key, "diffuse_color") == 0) {
                         if (obj_type == SPHERE)
-                            objects[obj_counter].sphere.diff_color = next_color(json, true);
+                            objects[obj_counter].sphere.diff_color = next_color(json, 1);
                         else if (obj_type == PLANE)
-                            objects[obj_counter].plane.diff_color = next_color(json, true);
+                            objects[obj_counter].plane.diff_color = next_color(json, 1);
                         else {
                             fprintf(stderr, "Error: read_json: diffuse_color vector can't be applied here: %d\n", line);
                             exit(1);
@@ -431,7 +431,7 @@ void read_json(FILE *json) {
                 skip_ws(json);
             }
             else if (c == ']') {
-                not_done = false;
+                not_done = 0;
             }
             else {
                 fprintf(stderr, "Error: read_json: Expecting comma or ]: %d\n", line);
