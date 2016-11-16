@@ -1,4 +1,4 @@
-# CS430-Project-2
+# CS430-Project-4
 This takes in a JSON file that contains information regarding a scene containing 3-D Objects. It then raycasts the objects and puts them in a ppm file (P6 format) for viewing
 .
 ## How to use ##

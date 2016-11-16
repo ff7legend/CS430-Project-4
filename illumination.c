@@ -1,8 +1,6 @@
 #include <math.h>
-#include "include/illumination.h"
-#include "include/vector_math.h"
-#include "include/json.h"
-
+#include "../include/illumination.h"
+#include "../include/vector_math.h"
 
 double clamp(double color_val){
     if (color_val < 0)
@@ -12,8 +10,24 @@ double clamp(double color_val){
     else
         return color_val;
 }
+void scale_color(double* color, double scalar, double* out_color) {
+    if (scalar < 0.0) {
+        fprintf(stderr, "Error: scale_color: Can't apply negative scalar to a color value\n");
+        exit(1);
+    }
+    out_color[0] = color[0] * scalar;
+    out_color[1] = color[1] * scalar;
+    out_color[2] = color[2] * scalar;
+}
+
+void copy_color(double* color, double* out_color) {
+    out_color[0] = color[0];
+    out_color[1] = color[1];
+    out_color[2] = color[2];
+}
 
 void calculate_diffuse(double *N, double *L, double *IL, double *KD, double *out_color) {
+   
     double n_dot_l = v3_dot(N, L);
     if (n_dot_l > 0) {
         double diffuse_product[3];
@@ -45,7 +59,6 @@ void calculate_specular(double ns, double *L, double *R, double *N, double *V, d
     }
 }
 
-
 double calculate_angular_att(Light *light, double direction_to_object[3]) {
     if (light->type != SPOTLIGHT)
         return 1.0;
@@ -67,6 +80,7 @@ double calculate_radial_att(Light *light, double distance_to_light) {
         fprintf(stdout, "WARNING: calculate_radial_att: Found all 0s for attenuation. Assuming default values of radial attenuation\n");
         light->rad_att2 = 1.0;
     }
+  
     if (distance_to_light > 99999999999999) return 1.0;
 
     double dl_sqr = sqr(distance_to_light);

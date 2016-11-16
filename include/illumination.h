@@ -1,5 +1,6 @@
-#ifndef CS430_PROJ3_ILLUMINATION_ILLUMINATION_H
-#define CS430_PROJ3_ILLUMINATION_ILLUMINATION_H
+#ifndef ILLUMINATION_H
+#define ILLUMINATION_H
+
 #include "json.h"
 
 /* function declarations */
@@ -19,9 +20,9 @@ void calculate_specular(double ns,
                         double *out_color);
 
 double clamp(double color_val);
-
+void scale_color(double* color, double scalar, double* out_color);
+void copy_color(double* color, double* out_color);
 double calculate_angular_att(Light *light, double direction_to_object[3]);
-
 double calculate_radial_att(Light *light, double distance_to_light);
 
-#endif 
+#endif //ILLUMINATION_H

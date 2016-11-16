@@ -1,11 +1,11 @@
-#ifndef CS430_PROJ3_ILLUMINATION_JSON_H
-#define CS430_PROJ3_ILLUMINATION_JSON_H
 
+#ifndef JSON_H
+#define JSON_H
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
+#include "base.h"
 
 #define MAX_OBJECTS 128     // maximum number of objects supported in json file
 #define CAMERA 1
@@ -13,6 +13,7 @@
 #define PLANE 3
 #define LIGHT 4
 #define SPOTLIGHT 5
+#define OBJECT 6
 
 // structs to store different types of objects
 typedef struct camera_t {
@@ -24,14 +25,20 @@ typedef struct sphere_t {
     double *diff_color;
     double *spec_color;
     double *position;
+    double reflect;
+    double refract;
     double radius;
+    double ior;
 } Sphere;
 
 typedef struct plane_t {
-    double *diff_color;    
-    double *spec_color;    
+    double *diff_color;     // diffuse color
+    double *spec_color;     // specular color
     double *position;
     double *normal;
+    double reflect;        // reflectivity
+    double refract;        // refractivity
+    double ior;            // index of refraction of the volume
 } Plane;
 
 typedef struct light_t {
@@ -46,6 +53,7 @@ typedef struct light_t {
     double ang_att0;
 } Light;
 
+// object datatype to store json data
 typedef struct object_t {
     int type;  // -1 so we can check if the object has been populated
     union {
@@ -64,6 +72,8 @@ extern int nobjects;
 
 /* function definitions */
 void read_json(FILE *json);
+void init_objects();
+void init_lights();
 void print_objects(object *obj);
 
-#endif 
+#endif //JSON_H
